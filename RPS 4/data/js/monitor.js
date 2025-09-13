@@ -536,6 +536,11 @@ function showImage(source, displayPath, settings) {
 		$("#filename .filename")[0].innerHTML = settings["path.filename"];
 		$("#filename .extension")[0].innerHTML = settings["path.extension"];
 		document.getElementById("quickMetadata").innerHTML = settings["metadata"];
+		if (settings["location"] != undefined) {
+			document.getElementById("location").innerHTML = settings["location"];
+		} else {
+			document.getElementById("location").innerHTML = "";
+		}
 
 		if (settings["pano"] != undefined && settings["pano"] == true) {
 	//				window.prompt("Copy to clipboard: Ctrl+C, Enter", html);

@@ -11,9 +11,48 @@ using System.Windows.Forms;
 using System.Globalization;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Net;
+using Newtonsoft.Json.Linq;
 
 namespace RPS {
     class Utils {
+        private static double ConvertDmsToDd(string dms) {
+            string[] parts = dms.Split(new char[] { ' ', '°', '\'', '"' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 3) {
+                double deg = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                double min = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                double sec = double.Parse(parts[2], CultureInfo.InvariantCulture);
+                return deg + (min / 60.0) + (sec / 3600.0);
+            } else if (parts.Length == 1) {
+                return double.Parse(parts[0], CultureInfo.InvariantCulture);
+            }
+            return 0;
+        }
+
+        public static string GetLocationFromGps(string latitudeStr, string longitudeStr) {
+            if (latitudeStr == null || longitudeStr == null) return null;
+            try {
+                double latitude = ConvertDmsToDd(latitudeStr);
+                double longitude = ConvertDmsToDd(longitudeStr);
+
+                if (latitudeStr.ToUpper().Contains("S")) latitude = -latitude;
+                if (longitudeStr.ToUpper().Contains("W")) longitude = -longitude;
+
+                string url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude.ToString(CultureInfo.InvariantCulture)}&lon={longitude.ToString(CultureInfo.InvariantCulture)}&accept-language=en";
+
+                using (WebClient wc = new WebClient()) {
+                    wc.Headers.Add("User-Agent", "RPS/4.0 (a screensaver)"); // Per Nominatim requirements
+                    string json = wc.DownloadString(url);
+                    JObject data = JObject.Parse(json);
+                    if (data["error"] == null && data["display_name"] != null) {
+                        return (string)data["display_name"];
+                    }
+                }
+            } catch (Exception ex) {
+                Debug.WriteLine("Error in GetLocationFromGps: " + ex.Message);
+            }
+            return null;
+        }
         public struct MSG {
             IntPtr hwnd;
             uint message;
