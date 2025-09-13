@@ -13,17 +13,20 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace RPS {
     class Utils {
         private static double ConvertDmsToDd(string dms) {
-            string[] parts = dms.Split(new char[] { ' ', '°', '\'', '"' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length >= 3) {
+            var matches = System.Text.RegularExpressions.Regex.Matches(dms, @"[0-9\.]+");
+            var parts = matches.Cast<System.Text.RegularExpressions.Match>().Select(m => m.Value).ToList();
+
+            if (parts.Count >= 3) {
                 double deg = double.Parse(parts[0], CultureInfo.InvariantCulture);
                 double min = double.Parse(parts[1], CultureInfo.InvariantCulture);
                 double sec = double.Parse(parts[2], CultureInfo.InvariantCulture);
                 return deg + (min / 60.0) + (sec / 3600.0);
-            } else if (parts.Length == 1) {
+            } else if (parts.Count == 1) {
                 return double.Parse(parts[0], CultureInfo.InvariantCulture);
             }
             return 0;
