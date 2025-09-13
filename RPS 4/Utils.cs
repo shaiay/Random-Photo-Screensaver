@@ -42,13 +42,22 @@ namespace RPS {
                 if (longitudeStr.ToUpper().Contains("W")) longitude = -longitude;
 
                 string url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude.ToString(CultureInfo.InvariantCulture)}&lon={longitude.ToString(CultureInfo.InvariantCulture)}&accept-language=en";
-
+                Debug.WriteLine("GetLocationFromGps url:" + url);
                 using (WebClient wc = new WebClient()) {
                     wc.Headers.Add("User-Agent", "RPS/4.0 (a screensaver)"); // Per Nominatim requirements
                     string json = wc.DownloadString(url);
                     JObject data = JObject.Parse(json);
-                    if (data["error"] == null && data["display_name"] != null) {
-                        return (string)data["display_name"];
+                    if (data["error"] == null && data["address"] != null) {
+                        string townish = (string)(
+                            data["address"]["town"] ?? 
+                            data["address"]["city"] ?? 
+                            data["address"]["municipality"] ?? 
+                            data["address"]["village"] ?? 
+                            ""
+                            );
+                        string prettyName = (townish.Length > 0 ? townish +", " : "") + data["address"]["country"];
+                        Debug.WriteLine("GetLocationFromGps:" + prettyName);
+                        return prettyName;
                     }
                 }
             } catch (Exception ex) {
