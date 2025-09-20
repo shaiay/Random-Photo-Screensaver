@@ -22,6 +22,11 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
+PrivilegesRequired=admin
+; This is required to write to {sys} and {autopf}.
+UsedUserAreasWarning=no
+; The installer writes to HKCU to set the screensaver for the current user.
+; This is the desired behavior, so we can safely disable this warning.
 OutputDir=.\install
 OutputBaseFilename=setup
 Compression=lzma
