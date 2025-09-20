@@ -48,14 +48,11 @@ namespace RPS {
                     string json = wc.DownloadString(url);
                     JObject data = JObject.Parse(json);
                     if (data["error"] == null && data["address"] != null) {
-                        string townish = (string)(
-                            data["address"]["town"] ?? 
-                            data["address"]["city"] ?? 
-                            data["address"]["municipality"] ?? 
-                            data["address"]["village"] ?? 
-                            ""
-                            );
-                        string prettyName = (townish.Length > 0 ? townish +", " : "") + data["address"]["country"];
+                        string townish = new[] { "town", "city", "municipality", "village" }
+                            .Select(key => (string)data["address"][key])
+                            .FirstOrDefault(val => !string.IsNullOrEmpty(val)) ?? "";
+                        string country = (string)data["address"]["country"] ?? "";
+                        string prettyName = !string.IsNullOrEmpty(townish) ? $"{townish}, {country}" : country;
                         Debug.WriteLine("GetLocationFromGps:" + prettyName);
                         return prettyName;
                     }
