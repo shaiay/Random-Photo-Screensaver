@@ -28,7 +28,7 @@ UsedUserAreasWarning=no
 ; The installer writes to HKCU to set the screensaver for the current user.
 ; This is the desired behavior, so we can safely disable this warning.
 OutputDir=.\install
-OutputBaseFilename=setup
+OutputBaseFilename=RPS_setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -43,7 +43,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "RPS 4\bin\Release\RPS4.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "RPS 4\bin\Release\*"; DestDir: "{app}"; Excludes: "*.vshost.exe,*.pdb,*.xml,*.manifest"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "RPS Launcher\bin\Release\Random Photo Screensaver.scr"; DestDir: "{sys}"; Flags: ignoreversion
+Source: "RPS Launcher\RPS Launcher\bin\Release\Random Photo Screensaver.scr"; DestDir: "{sys}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
