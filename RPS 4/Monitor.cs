@@ -97,6 +97,7 @@ namespace RPS {
         public void defaultShowHide() {
             this.InvokeScript("setBackgroundColour", new string[] { Convert.ToString(this.screensaver.config.getPersistant("backgroundColour")) });
             this.InvokeScript("toggle", new string[] { "#quickMetadata", Convert.ToString(this.screensaver.config.getPersistantBool("showQuickMetadataM" + (this.id + 1))) });
+            this.InvokeScript("toggle", new string[] { "#location", Convert.ToString(this.screensaver.config.getPersistantBool("showLocationM" + (this.id + 1))) });
             this.InvokeScript("toggle", new string[] { "#filename", Convert.ToString(this.screensaver.config.getPersistantBool("showFilenameM" + (this.id + 1))) });
             this.InvokeScript("toggle", new string[] { "#filename .root", Convert.ToString(this.screensaver.config.getPersistantBool("showPathRoot")) });
             this.InvokeScript("toggle", new string[] { "#filename .subfolders", Convert.ToString(this.screensaver.config.getPersistantBool("showPathSubfolders")) });
@@ -440,6 +441,12 @@ namespace RPS {
                 }
                 if (rawMetadata != null && rawMetadata != "") {
                     this.quickMetadata = new MetadataTemplate(rawMetadata, Utils.HtmlDecode(this.screensaver.config.getPersistantString("quickMetadata")));
+                    if (this.quickMetadata.metadata.ContainsKey("gpslatitude") && this.quickMetadata.metadata.ContainsKey("gpslongitude")) {
+                        string location = Utils.GetLocationFromGps(this.quickMetadata.metadata["gpslatitude"], this.quickMetadata.metadata["gpslongitude"]);
+                        if (location != null) {
+                            this.imageSettings["location"] = location;
+                        }
+                    }
                     this.imageSettings["metadata"] = this.quickMetadata.fillTemplate();
                 }
                 this.imageSettings["mediatype"] = "image";

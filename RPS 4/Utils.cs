@@ -11,9 +11,57 @@ using System.Windows.Forms;
 using System.Globalization;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Net;
+using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace RPS {
     class Utils {
+        private static double ConvertDmsToDd(string dms) {
+            var matches = System.Text.RegularExpressions.Regex.Matches(dms, @"[0-9\.]+");
+            var parts = matches.Cast<System.Text.RegularExpressions.Match>().Select(m => m.Value).ToList();
+
+            if (parts.Count >= 3) {
+                double deg = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                double min = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                double sec = double.Parse(parts[2], CultureInfo.InvariantCulture);
+                return deg + (min / 60.0) + (sec / 3600.0);
+            } else if (parts.Count == 1) {
+                return double.Parse(parts[0], CultureInfo.InvariantCulture);
+            }
+            return 0;
+        }
+
+        public static string GetLocationFromGps(string latitudeStr, string longitudeStr) {
+            if (latitudeStr == null || longitudeStr == null) return null;
+            try {
+                double latitude = ConvertDmsToDd(latitudeStr);
+                double longitude = ConvertDmsToDd(longitudeStr);
+
+                if (latitudeStr.ToUpper().Contains("S")) latitude = -latitude;
+                if (longitudeStr.ToUpper().Contains("W")) longitude = -longitude;
+
+                string url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude.ToString(CultureInfo.InvariantCulture)}&lon={longitude.ToString(CultureInfo.InvariantCulture)}&accept-language=en";
+                Debug.WriteLine("GetLocationFromGps url:" + url);
+                using (WebClient wc = new WebClient()) {
+                    wc.Headers.Add("User-Agent", "RPS/4.0 (a screensaver)"); // Per Nominatim requirements
+                    string json = wc.DownloadString(url);
+                    JObject data = JObject.Parse(json);
+                    if (data["error"] == null && data["address"] != null) {
+                        string townish = new[] { "town", "city", "municipality", "village" }
+                            .Select(key => (string)data["address"][key])
+                            .FirstOrDefault(val => !string.IsNullOrEmpty(val)) ?? "";
+                        string country = (string)data["address"]["country"] ?? "";
+                        string prettyName = !string.IsNullOrEmpty(townish) ? $"{townish}, {country}" : country;
+                        Debug.WriteLine("GetLocationFromGps:" + prettyName);
+                        return prettyName;
+                    }
+                }
+            } catch (Exception ex) {
+                Debug.WriteLine("Error in GetLocationFromGps: " + ex.Message);
+            }
+            return null;
+        }
         public struct MSG {
             IntPtr hwnd;
             uint message;

@@ -3,6 +3,8 @@ Random Photo Screensaver(tm) 4
 
 Random Photo Screensaver 4 (RPS4) is a photo slideshow screensaver written in Visual Studio C#. 
 
+* This fork adds support for displaying photo location using EXIF GPS data. Most of the work was done by Jules, I just added some finishing touches and tweaks.
+
 Download / preview
 ------------------
 You can download the latest executable for Windows 7 & 8/8.1 from [abScreensavers.com](http://www.abscreensavers.com/random-photo-screensaver). This also showcases some of its many features.
