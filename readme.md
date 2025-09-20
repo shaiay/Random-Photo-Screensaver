@@ -27,6 +27,20 @@ The following instruction are how to compile RPS from source in Microsoft Visual
 - Download the source files from https://github.com/marijnkampf/Random-Photo-Screensaver/tree/RPS4
 - Open RPS 4.sln
 - Compile
+
+Building the Installer
+----------------------
+To build the installer, you first need to compile the solution and then use the Inno Setup compiler to create the setup package.
+
+1.  **Compile the Solution:**
+    *   Open `RPS 4.sln` in Visual Studio.
+    *   Select the "Release" build configuration.
+    *   Build the solution. This will create the necessary executables and libraries in the `RPS 4\bin\Release` and `RPS Launcher\bin\Release` directories.
+
+2.  **Compile the Installer Script:**
+    *   Download and install Inno Setup from [jrsoftware.org](http://www.jrsoftware.org/isinfo.php).
+    *   Open the `setup.iss` file in the Inno Setup Compiler.
+    *   Compile the script. This will generate a `setup.exe` file in the `install` directory at the root of the repository. This is the distributable installer for the screensaver.
  
 History
 -------
